@@ -125,7 +125,7 @@ def best_soluce_print(L, city, tempo, k, time_window):
     print(f"Coût total (distance) : {meilleur_cout}")
 
     # Visualisation graphique
-    colors = [np.random.rand(8) for _ in range(len(meilleure_solution))]
+    colors = [np.random.rand(3) for _ in range(len(meilleure_solution))]
     for t, c in zip(meilleure_solution, colors):
         for i in range(len(t) - 1):
             p1, p2 = city[t[i]], city[t[i + 1]]
@@ -202,6 +202,9 @@ def plne(nbr, k, city, tempo, time_window):
     # Ici, pour la simplicité, on impose directement :
     prob += temps_max <= time_window  # makespan ≤ fenêtre donnée
 
+    # ATTENTION : cette modélisation grossière suppose que la "distance totale / k" approxime le temps par véhicule.
+    # Pour un modèle exact, il faudrait des variables t_i pour chaque client et chaque véhicule comme précédemment.
+    # Mais pour nos petits n, on accepte cette approximation.
 
     # 8.5) On lie temps_max à l’objectif en orienteur temporel :
     #       temps_max ≥ distance_totale / k  → distance_totale ≤ k * temps_max
@@ -251,7 +254,7 @@ def plne(nbr, k, city, tempo, time_window):
 # 9) Fonction de bascule : si PLNE échoue, on appelle Tabu Search
 def solve_vrptw_complete(nbr, k, city, tempo, time_window):
     # Pour petits n,k → PLNE
-    if nbr <= 10 and k <= 5:
+    if nbr <= 10 and k <= 3:
         tours, dist = plne(nbr, k, city, tempo, time_window)
         if tours is not None:
             print("\n=== Résultats PLNE ===")
@@ -288,7 +291,7 @@ def solve_vrptw_complete(nbr, k, city, tempo, time_window):
             return
 
     # Sinon → Tabu Search
-    print("Utilisation de la métaheuristique Tabu Search.")
+    print("→ Utilisation de la métaheuristique Tabu Search (besoin de plus de clients ou véhicules).")
     meilleure_solution, meilleur_cout = recherche_tabou_vrp(tempo, k, nbr, time_window)
     best_soluce_print((meilleure_solution, meilleur_cout), city, tempo, k, time_window)
 
